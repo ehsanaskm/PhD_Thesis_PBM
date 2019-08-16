@@ -1,0 +1,68 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      alphat.water;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [1 -1 -1 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    inletTop
+    {
+        type            calculated;
+        value           $internalField;
+    }
+    inletBottom
+    {
+        type            calculated;
+        value           $internalField;
+    }
+
+    outlet
+    {
+        type            calculated;
+        value           $internalField;
+    }
+
+    shaftImpeller
+    {
+        type            compressible::alphatWallFunction;
+        Prt             0.85;
+        value           $internalField;
+    }
+    vessel
+    {
+        type            compressible::alphatWallFunction;
+        Prt             0.85;
+        value           $internalField;
+    }
+    sparger
+    {
+        type            compressible::alphatWallFunction;
+        Prt             0.85;
+        value           $internalField;
+    }
+    propellerStem
+    {
+        type            compressible::alphatWallFunction;
+        Prt             0.85;
+        value           $internalField;
+    }
+    
+
+}
+
+// ************************************************************************* //

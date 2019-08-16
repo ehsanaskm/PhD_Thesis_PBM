@@ -1,0 +1,12 @@
+SOURCE = \
+$(populationBalanceModel)/populationBalanceModel.C \
+$(populationBalanceModel)/populationBalanceReturnMethods/populationBalanceReturn/populationBalanceReturn.C \
+$(populationBalanceModel)/populationBalanceReturnMethods/populationBalanceReturn/newpopulationBalanceReturn.C \
+$(populationBalanceModel)/incompleteGammaFunction/incompleteGammaFunction.C \
+$(breakupLaws)/breakupLaw/breakupLaw.C \
+$(breakupLaws)/breakupLaw/newbreakupModels.C \
+$(breakupLaws)/LuoAndSvendsenBreak/LuoAndSvendsenBreak.C \
+$(coalescenceLaws)/coalescenceLaw/coalescenceLaw.C \
+$(coalescenceLaws)/coalescenceLaw/newcoalescenceModels.C \
+$(coalescenceLaws)/LuoAndSvendsenCoal/LuoAndSvendsenCoal.C \
+$(populationBalanceModel)/populationBalanceReturnMethods/qmom/qmom.C 

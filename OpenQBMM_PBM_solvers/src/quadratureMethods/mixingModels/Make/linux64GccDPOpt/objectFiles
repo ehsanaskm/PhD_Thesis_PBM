@@ -1,0 +1,14 @@
+OBJECTS = \
+$(OBJECTS_DIR)/mixingModel.o\
+$(OBJECTS_DIR)/newMixingModel.o\
+$(OBJECTS_DIR)/diffusionModel.o\
+$(OBJECTS_DIR)/newDiffusionModel.o\
+$(OBJECTS_DIR)/noDiffusion.o\
+$(OBJECTS_DIR)/turbulentDiffusion.o\
+$(OBJECTS_DIR)/molecularDiffusion.o\
+$(OBJECTS_DIR)/mixingKernel.o\
+$(OBJECTS_DIR)/newMixingKernel.o\
+$(OBJECTS_DIR)/IEM.o\
+$(OBJECTS_DIR)/FokkerPlanck.o\
+$(OBJECTS_DIR)/noMixing.o\
+$(OBJECTS_DIR)/turbulentMixing.o

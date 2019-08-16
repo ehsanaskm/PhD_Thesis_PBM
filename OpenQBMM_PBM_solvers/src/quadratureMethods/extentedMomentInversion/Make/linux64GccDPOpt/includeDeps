@@ -1,0 +1,5 @@
+include extendedMomentInversion/extendedMomentInversion.dep
+include extendedMomentInversion/newExtendedMomentInversion.dep
+include gamma/gammaEQMOM.dep
+include lognormal/lognormalEQMOM.dep
+include beta/betaEQMOM.dep

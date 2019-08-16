@@ -1,0 +1,381 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2015 Alberto Passalacqua
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is derivative work of OpenFOAM.
+
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+
+\*---------------------------------------------------------------------------*/
+
+#include "luoModel.H"
+#include "addToRunTimeSelectionTable.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+namespace Foam
+{
+namespace populationBalanceSubModels
+{
+namespace aggregationKernels
+{
+    defineTypeNameAndDebug(luoModel, 0);
+
+    addToRunTimeSelectionTable
+    (
+        aggregationKernel,
+        luoModel,
+        dictionary
+    );
+}
+}
+}
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::populationBalanceSubModels::aggregationKernels::luoModel
+::luoModel
+(
+    const dictionary& dict
+)
+:
+    aggregationKernel(dict),
+    rhoa_(dict.lookup("rhoa")),
+    rhob_(dict.lookup("rhob")),
+    sigma_(dict.lookup("sigma"))
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::populationBalanceSubModels::aggregationKernels::luoModel
+::~luoModel()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::tmp<Foam::volScalarField>
+Foam::populationBalanceSubModels::aggregationKernels::luoModel::Ka
+(
+    const volScalarField& abscissa1,
+    const volScalarField& abscissa2
+) const
+{  
+	 const fvMesh& mesh = abscissa1.mesh();
+
+	 const volScalarField& epsilon = 
+		abscissa1.mesh().lookupObject<volScalarField>("epsilon.water"); 
+
+	  const volScalarField& alpha = 
+		abscissa1.mesh().lookupObject<volScalarField>("alpha.air");
+
+  volScalarField p_coal
+  (
+			IOobject
+			(
+				"p_coal",
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			  alpha/**
+			dimensionedScalar
+			(
+			   "one", 
+			   pow(dimTime,-1), 
+			   1.
+		        )*/
+                         
+
+  );
+
+  volScalarField omega_coal
+  (
+			IOobject
+			(
+				"omega_coal",
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			  alpha*
+			dimensionedScalar
+			(
+			   "one", 
+			   dimensionSet(0,3,-1,0,0,0,0), 
+			   1.
+		        )
+                         
+
+  );
+
+  volScalarField xi
+  (
+			IOobject
+			(
+				"xi",
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			  alpha/**
+			dimensionedScalar
+			(
+			   "one", 
+			   pow(dimTime,-1), 
+			   1.
+		        )*/
+                         
+
+  );
+
+  volScalarField u_i
+  (
+			IOobject
+			(
+				"u_i",
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			  alpha*
+			dimensionedScalar
+			(
+			   "one", 
+			   dimensionSet(0,1,-1,0,0,0,0), 
+			   1.
+		        )
+                         
+
+  );
+
+  volScalarField u_j
+  (
+			IOobject
+			(
+				"u_j",
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			  alpha*
+			dimensionedScalar
+			(
+			   "one", 
+			   dimensionSet(0,1,-1,0,0,0,0), 
+			   1.
+		        )
+                         
+
+  );
+
+  volScalarField u_i_j
+  (
+			IOobject
+			(
+				"u_i_j",
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			  alpha*
+			dimensionedScalar
+			(
+			   "one", 
+			   dimensionSet(0,1,-1,0,0,0,0), 
+			   1.
+		        )
+                         
+
+  );
+
+  volScalarField weber
+  (
+			IOobject
+			(
+				"weber",
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			  alpha/**
+			dimensionedScalar
+			(
+			   "one", 
+			   pow(dimTime,-1), 
+			   1.
+		        )*/
+                         
+
+  );
+  volScalarField num
+  (
+			IOobject
+			(
+				"num",
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			  alpha/**
+			dimensionedScalar
+			(
+			   "one", 
+			   pow(dimTime,-1), 
+			   1.
+		        )*/
+                         
+
+  );
+  volScalarField den
+  (
+			IOobject
+			(
+				"den",
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			  alpha/**
+			dimensionedScalar
+			(
+			   "one", 
+			   pow(dimTime,-1), 
+			   1.
+		        )*/
+                         
+
+  );
+  volScalarField coalRate
+  (
+			IOobject
+			(
+				"coalRate",
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			  alpha*
+			dimensionedScalar
+			(
+			   "one", 
+			   dimensionSet(0,3,-1,0,0,0,0), 
+			   1.
+		        )
+                         
+
+  );
+
+
+        xi=abscissa1/1000/(abscissa2/1000+dimensionedScalar("SMALL", dimLength, SMALL));
+        u_i = 1.43*pow(epsilon*abscissa1/1000, 1./3);
+        u_j = 1.43*pow(epsilon*abscissa2/1000, 1./3);
+        u_i_j = sqrt(pow(u_i, 2.)+pow(u_j, 2.));
+        weber = rhob_*abscissa1/1000*pow(u_i_j,2.0)/sigma_;
+	num = pow((0.75*(1.+pow(xi,2.))*(1.+pow(xi,3.))), 0.5);
+        den = pow((0.5+(rhoa_/rhob_)),0.5)*pow((1.+xi),3.);
+        p_coal = exp(-(num/den)*pow(weber, 0.5)); 
+        omega_coal = (M_PI/4.)*pow((abscissa1/1000+abscissa2/1000),2.)*u_i_j;
+        coalRate = omega_coal*p_coal;
+
+       forAll(coalRate,cellI)
+       {
+	   if(coalRate[cellI] < 0.0) 
+	   {
+		  coalRate[cellI] = 0.0;
+	   } 
+	   else
+	   {
+		 coalRate[cellI] = coalRate[cellI];
+	   }
+       }
+     
+
+/*
+
+	scalar omega_coal, xi, p_coal, weber, num, den, u_i, u_j, u_i_j,coalRate;
+
+	xi=di/(dj+1e-15);
+        dimensionedScalar result("coalRate",dimMass/pow3(dimLength)/dimTime,0.0); 
+	u_i = 1.43*pow(max(epsf).value()*di, 1./3);
+
+	u_j = 1.43*pow(max(epsf).value()*dj, 1./3);
+	u_i_j = sqrt(pow(u_i, 2.)+pow(u_j, 2.));
+	weber = rhob_.value()*di*pow(u_i_j,2.0)/sigma_.value();
+	num = pow((0.75*(1.+pow(xi,2.))*(1.+pow(xi,3.))), 0.5);
+        den = pow((0.5+(rhoa_/rhob_).value()),0.5)*pow((1.+xi),3.);
+        p_coal = exp(-(num/den)*pow(weber, 0.5));
+ 
+        omega_coal = (M_PI/4.)*pow((di+dj),2.)*u_i_j;
+        coalRate = omega_coal*p_coal;
+*/
+/* 
+    return
+        tmp<volScalarField>
+        (
+            new volScalarField
+            (
+                IOobject
+                (
+                    "constantAggregationK",
+                    abscissa1.mesh().time().timeName(),
+                    abscissa1.mesh()
+                ),
+                abscissa1.mesh(),
+                dimensionedScalar
+                (
+                    "constAggK", 
+                    pow3(abscissa1.dimensions())/dimTime, 
+                    Ca_.value()
+                )
+            )
+        );
+*/
+
+
+    return
+        tmp<volScalarField>
+        (
+            new volScalarField
+            (
+                IOobject
+                (
+                    "constantAggregationK",
+                    abscissa1.mesh().time().timeName(),
+                    abscissa1.mesh()
+                ),
+                   coalRate
+                
+            )
+        );
+
+}
+
+// ************************************************************************* //

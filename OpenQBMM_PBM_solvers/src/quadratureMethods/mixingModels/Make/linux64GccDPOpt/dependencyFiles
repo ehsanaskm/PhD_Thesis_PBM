@@ -1,0 +1,14 @@
+DEPENDENCIES = \
+mixingModel/mixingModel.dep\
+mixingModel/newMixingModel.dep\
+mixingSubModels/diffusionModels/diffusionModel/diffusionModel.dep\
+mixingSubModels/diffusionModels/diffusionModel/newDiffusionModel.dep\
+mixingSubModels/diffusionModels/noDiffusion/noDiffusion.dep\
+mixingSubModels/diffusionModels/turbulentDiffusion/turbulentDiffusion.dep\
+mixingSubModels/diffusionModels/molecularDiffusion/molecularDiffusion.dep\
+mixingSubModels/mixingKernels/mixingKernel/mixingKernel.dep\
+mixingSubModels/mixingKernels/mixingKernel/newMixingKernel.dep\
+mixingSubModels/mixingKernels/IEM/IEM.dep\
+mixingSubModels/mixingKernels/FokkerPlanck/FokkerPlanck.dep\
+noMixing/noMixing.dep\
+turbulentMixing/turbulentMixing.dep

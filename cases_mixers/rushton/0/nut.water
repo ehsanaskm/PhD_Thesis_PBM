@@ -1,0 +1,63 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    class       volScalarField;
+    object      nut.water;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -1 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+  
+    spargerInlet
+    {
+        type            calculated;
+        value           $internalField;
+    }
+
+    top
+    {
+        type            calculated;
+        value           $internalField;
+    }
+
+    spargerWall
+    {
+        type            nutkWallFunction;
+        value           uniform 0;
+    }
+
+    shaft
+    {
+        type            nutkWallFunction;
+        value           uniform 0;
+    }
+
+    rotor
+    {
+        type            nutkWallFunction;
+        value           uniform 0;
+    }
+
+    stator
+    {
+        type            nutkWallFunction;
+        value           uniform 0;
+    }
+
+
+}
+
+// ************************************************************************* //

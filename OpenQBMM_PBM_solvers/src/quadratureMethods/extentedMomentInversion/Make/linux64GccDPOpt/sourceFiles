@@ -1,0 +1,6 @@
+SOURCE = \
+extendedMomentInversion/extendedMomentInversion.C\
+extendedMomentInversion/newExtendedMomentInversion.C\
+gamma/gammaEQMOM.C\
+lognormal/lognormalEQMOM.C\
+beta/betaEQMOM.C

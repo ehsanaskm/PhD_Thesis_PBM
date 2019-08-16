@@ -1,0 +1,292 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2013-2014 OpenFOAM Foundation
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    NDPBM (Number Density Approach Population Balance Model) bubble diameter model
+
+Author
+    Ehsan Askari, M.Sc
+    ehsan.askari@usherbrooke.ca
+
+\*---------------------------------------------------------------------------*/
+
+#include "NDPBM.H"
+#include "NDPBMsource.H"
+#include "twoPhaseSystem.H"
+#include "fvmDdt.H"
+#include "fvmDiv.H"
+#include "fvmSup.H"
+#include "fvcDdt.H"
+#include "fvcDiv.H"
+#include "fvcAverage.H"
+#include "mathematicalConstants.H"
+#include "fundamentalConstants.H"
+#include "addToRunTimeSelectionTable.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+namespace Foam
+{
+namespace diameterModels
+{
+    defineTypeNameAndDebug(NDPBM, 0);
+
+    addToRunTimeSelectionTable
+    (
+        diameterModel,
+        NDPBM,
+        dictionary
+    );
+}
+}
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::diameterModels::NDPBM::NDPBM
+(
+    const dictionary& diameterProperties,
+    const phaseModel& phase
+)
+:
+    diameterModel(diameterProperties, phase),
+/*
+    kappai_
+    (
+        IOobject
+        (
+            IOobject::groupName("kappai", phase.name()),
+            phase_.U().time().timeName(),
+            phase_.U().mesh(),
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        phase_.U().mesh()
+    ),
+*/
+    n_             //add
+    (
+        IOobject
+        (
+            IOobject::groupName("n", phase.name()),
+            phase_.U().time().timeName(),
+            phase_.U().mesh(),
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        phase_.U().mesh()
+    ),
+////////////////////////////////////////////////////////////////////
+    S_   //add
+    (
+        IOobject
+        (
+            IOobject::groupName("S", phase.name()),
+            phase_.U().time().timeName(),
+            phase_.U().mesh(),
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        phase_.U().mesh() 
+    ),
+
+
+    dMax_("dMax", dimLength, diameterProperties_.lookup("dMax")),
+    dMin_("dMin", dimLength, diameterProperties_.lookup("dMin")),
+    residualAlpha_
+    (
+        "residualAlpha",
+        dimless,
+        diameterProperties_.lookup("residualAlpha")
+    ),
+    d_
+    (
+        IOobject
+        (
+            IOobject::groupName("d", phase.name()),
+            phase_.U().time().timeName(),
+            phase_.U().mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        dsm()
+    )
+/*
+    d32_   //add
+    (
+        IOobject
+        (
+            IOobject::groupName("d32", phase.name()),
+            phase_.U().time().timeName(),
+            phase_.U().mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        d32sm()
+    ),
+*/
+
+/*
+    sources_
+    (
+        diameterProperties_.lookup("sources"),
+        NDPBMsource::iNew(*this)
+    )
+*/
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::diameterModels::NDPBM::~NDPBM()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+/*
+Foam::tmp<Foam::volScalarField> Foam::diameterModels::NDPBM::d32sm() const
+{
+    return max(6/max(kappai_, 6/dMax_), dMin_);
+}
+*/
+Foam::tmp<Foam::volScalarField> Foam::diameterModels::NDPBM::dsm() const //add
+{
+    return max(dMin_, min((cbrt(6*phase_/3.14/n_)), dMax_));
+}
+
+// Placeholder for the nucleation/condensation model
+// Foam::tmp<Foam::volScalarField> Foam::diameterModels::NDPBM::Rph() const
+// {
+//     const volScalarField& T = phase_.thermo().T();
+//     const volScalarField& p = phase_.thermo().p();
+//
+//     scalar A, B, C, sigma, vm, Rph;
+//
+//     volScalarField ps(1e5*pow(10, A - B/(T + C)));
+//     volScalarField Dbc
+//     (
+//         4*sigma*vm/(constant::physicoChemical::k*T*log(p/ps))
+//     );
+//
+//     return constant::mathematical::pi*sqr(Dbc)*Rph;
+// }
+
+void Foam::diameterModels::NDPBM::correct()
+{
+    // Initialise the accumulated source term to the dilatation effect
+/*    volScalarField R
+    (
+        (
+            (2.0/3.0)
+           /max
+            (
+                fvc::average(phase_ + phase_.oldTime()),
+                residualAlpha_
+            )
+        )
+       *(fvc::ddt(phase_) + fvc::div(phase_.phiAlpha()))
+    );
+*/
+    //Add
+   
+  
+    forAll(sources_, j)
+    {
+        S_ += sources_[j].S();
+    }
+
+  
+/*    // Construct the interfacial curvature equation
+    fvScalarMatrix kappaiEqn
+    (
+        fvm::ddt(kappai_) + fvm::div(phase_.phi(), kappai_)
+      - fvm::Sp(fvc::div(phase_.phi()), kappai_)
+     ==
+      - fvm::SuSp(R, kappai_)
+    //+ Rph() // Omit the nucleation/condensation term
+    );
+
+    kappaiEqn.relax();
+    kappaiEqn.solve();
+*/
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	fvScalarMatrix nEqn //add
+        (
+            fvm::ddt(n_)
+          + fvm::div(phase_.phi(), n_)
+              ==
+          fvm::SuSp(S_, n_)
+
+        );
+
+    
+        nEqn.relax(); //add
+        nEqn.solve();
+
+      forAll(n_, I)    //add
+		{
+			if(n_[I] < 1.0e-8)    
+			{
+				n_[I]=1.0e-8;
+
+			}
+		}
+
+
+    // Update the Sauter-mean diameter
+    d_ = dsm();
+//    d32_ = d32sm();
+
+      forAll(d_, I)    //add
+		{
+			if(phase_[I] < 1.0e-6)    
+			{
+				d_[I]=1.0e-4;
+
+			}
+		}
+
+}
+
+
+bool Foam::diameterModels::NDPBM::read(const dictionary& phaseProperties)
+{
+    diameterModel::read(phaseProperties);
+
+    diameterProperties_.lookup("dMax") >> dMax_;
+    diameterProperties_.lookup("dMin") >> dMin_;
+
+    // Re-create all the sources updating number, type and coefficients
+    PtrList<NDPBMsource>
+    (
+        diameterProperties_.lookup("sources"),
+        NDPBMsource::iNew(*this)
+    ).transfer(sources_);
+
+    return true;
+}
+
+
+// ************************************************************************* //

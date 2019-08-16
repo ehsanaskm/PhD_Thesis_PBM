@@ -1,0 +1,21 @@
+populationBalanceModel = populationBalanceModel
+$(populationBalanceModel)/populationBalanceModel.C
+$(populationBalanceModel)/populationBalanceReturnMethods/populationBalanceReturn/populationBalanceReturn.C
+$(populationBalanceModel)/populationBalanceReturnMethods/populationBalanceReturn/newpopulationBalanceReturn.C
+$(populationBalanceModel)/incompleteGammaFunction/incompleteGammaFunction.C
+
+breakupLaws = $(populationBalanceModel)/breakupLaws
+$(breakupLaws)/breakupLaw/breakupLaw.C
+$(breakupLaws)/breakupLaw/newbreakupModels.C
+$(breakupLaws)/LuoAndSvendsenBreak/LuoAndSvendsenBreak.C
+
+coalescenceLaws = $(populationBalanceModel)/coalescenceLaws
+$(coalescenceLaws)/coalescenceLaw/coalescenceLaw.C
+$(coalescenceLaws)/coalescenceLaw/newcoalescenceModels.C
+$(coalescenceLaws)/LuoAndSvendsenCoal/LuoAndSvendsenCoal.C
+
+
+$(populationBalanceModel)/populationBalanceReturnMethods/qmom/qmom.C
+
+
+LIB = $(FOAM_LIBBIN)/libpopulationModels

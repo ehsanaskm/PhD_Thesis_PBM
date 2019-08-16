@@ -1,0 +1,655 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.0                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     twoPhaseEulerFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         20;
+
+deltaT          1e-4;
+
+writeControl    runTime;
+
+writeInterval   0.5;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  yes;
+
+maxCo           0.3;
+
+maxDeltaT       0.005;
+
+functions
+{
+    fieldAverage1
+    {
+        type            fieldAverage;
+        libs ( "libfieldFunctionObjects.so" );
+        writeControl    writeTime;
+        fields
+        (
+            U.air
+            {
+                 mean        on;
+                 prime2Mean  off;
+                 base        time;
+            }
+
+            U.water
+            {
+                 mean        on;
+                 prime2Mean  off;
+                 base        time;
+            }
+
+            alpha.air
+            {
+                 mean        on;
+                 prime2Mean  off;
+                 base        time;
+            }
+
+            p
+            {
+                 mean        on;
+                 prime2Mean  off;
+                 base        time;
+            }
+
+
+            KLa
+            {
+                 mean        on;
+                 prime2Mean  off;
+                 base        time;
+            }
+
+            d32
+            {
+                 mean        on;
+                 prime2Mean  off;
+                 base        time;
+            }
+
+            Y_O2
+            {
+                 mean        on;
+                 prime2Mean  off;
+                 base        time;
+            }
+
+            L1
+            {
+                 mean        on;
+                 prime2Mean  off;
+                 base        time;
+            }
+            L2
+            {
+                 mean        on;
+                 prime2Mean  off;
+                 base        time;
+            }
+            W1
+            {
+                 mean        on;
+                 prime2Mean  off;
+                 base        time;
+            }
+            W2
+            {
+                 mean        on;
+                 prime2Mean  off;
+                 base        time;
+            }
+            sigma
+            {
+                 mean        on;
+                 prime2Mean  off;
+                 base        time;
+            }
+
+
+        );
+    }
+
+
+    alpha.air_lowerInnerCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerInnerCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+            alpha.air
+
+        );
+    }
+
+    d32_lowerInnerCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerInnerCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            d32
+
+        );
+    }
+
+    KLa_lowerInnerCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerInnerCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            KLa
+
+        );
+    }
+
+    m0_lowerInnerCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerInnerCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            moment.0.populationBalance
+
+        );
+    }
+
+    epsilon.water_lowerInnerCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerInnerCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            epsilon.water
+        );
+    }
+
+    NDF_lowerInnerCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerInnerCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            W1Mean
+            W2Mean
+            L1Mean
+            L2Mean
+            sigmaMean
+        );
+    }
+
+    Y_O2_lowerInnerCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerInnerCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            Y_O2
+        );
+    }
+
+    alpha.air_lowerOuterCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerOuterCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+            alpha.air
+
+        );
+    }
+
+    d32_lowerOuterCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerOuterCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            d32
+
+        );
+    }
+
+    KLa_lowerOuterCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerOuterCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            KLa
+
+        );
+    }
+
+    m0_lowerOuterCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerOuterCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            moment.0.populationBalance
+
+        );
+    }
+
+    epsilon.water_lowerOuterCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerOuterCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            epsilon.water
+        );
+    }
+
+    NDF_lowerOuterCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerOuterCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            W1Mean
+            W2Mean
+            L1Mean
+            L2Mean
+            sigmaMean
+        );
+    }
+
+    Y_O2_lowerOuterCenter
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            lowerOuterCenter;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            Y_O2
+        );
+    }
+
+
+    alpha.air_aboveRotor
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            aboveRotor;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+            alpha.air
+
+        );
+    }
+
+   d32_aboveRotor
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            aboveRotor;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            d32
+
+        );
+    }
+
+    KLa_aboveRotor
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            aboveRotor;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            KLa
+
+        );
+    }
+
+    m0_aboveRotor
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            aboveRotor;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            moment.0.populationBalance
+
+        );
+    }
+
+    epsilon.water_aboveRotor
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            aboveRotor;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            epsilon.water
+        );
+    }
+
+    NDF_aboveRotor
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            aboveRotor;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            W1Mean
+            W2Mean
+            L1Mean
+            L2Mean
+            sigmaMean
+        );
+    }
+
+    Y_O2_aboveRotor
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            aboveRotor;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            Y_O2
+        );
+    }
+
+    KLa_waterZone
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            waterZone;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            KLa
+            
+
+        );
+    }
+
+    m0_waterZone
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            waterZone;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            moment.0.populationBalance
+            
+
+        );
+    }
+
+    d32_waterZone
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            waterZone;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            d32
+            
+
+        );
+    }
+
+    NDF_waterZone
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            waterZone;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            W1Mean
+            W2Mean
+            L1Mean
+            L2Mean
+            sigmaMean
+        );
+    }
+
+    Y_O2_waterZone
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            waterZone;
+        operation       volAverage;
+       // weightField     alpha1;
+        fields
+        (
+
+            Y_O2
+        );
+    }
+
+    probes
+    {
+        // Where to load it from
+        functionObjectLibs ( "libsampling.so" );
+
+        type            probes;
+
+        // Name of the directory for probe data
+        name            probes;
+
+        // Write at same frequency as fields
+        outputControl   timeStep;
+        outputInterval  1;
+
+        // Fields to be probed
+        fields
+        (
+            Y_O2
+	    
+
+        );
+
+        probeLocations
+        (
+            (0 -0.04 0.05)
+
+        );
+    }
+
+}
+
+
+// ************************************************************************* //

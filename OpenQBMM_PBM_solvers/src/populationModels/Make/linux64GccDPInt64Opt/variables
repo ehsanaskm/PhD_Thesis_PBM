@@ -1,0 +1,4 @@
+populationBalanceModel = populationBalanceModel
+breakupLaws = $(populationBalanceModel)/breakupLaws
+coalescenceLaws = $(populationBalanceModel)/coalescenceLaws
+LIB = $(FOAM_LIBBIN)/libpopulationModels

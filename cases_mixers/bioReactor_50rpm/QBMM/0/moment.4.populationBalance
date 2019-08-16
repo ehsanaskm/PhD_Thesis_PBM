@@ -1,0 +1,62 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.0                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "6.200012727337";
+    object      moment.4.populationBalance;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform 1.14511052223348E-06;
+
+boundaryField
+{
+    inletBottom
+    {
+        type            fixedValue;
+        value           uniform 1.14511052223348E-06;
+    }
+    inletTop
+    {
+        type            fixedValue;
+        value           uniform 1.14511052223348E-06;
+    }
+    outlet
+    {
+        type            zeroGradient;
+    }
+     impeller
+    {
+        type            zeroGradient;
+    }
+    sparger
+    {
+        type            zeroGradient;
+    }
+    vessel
+    {
+        type            zeroGradient;
+    }
+    shaft
+    {
+        type            zeroGradient;
+    }
+    heater
+    {
+        type            zeroGradient;
+    }
+}
+}
+
+
+// ************************************************************************* //

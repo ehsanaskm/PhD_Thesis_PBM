@@ -1,0 +1,1250 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of foam-extend.
+
+    foam-extend is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    qmom
+
+sourceFiles
+    qmom.H
+
+Author
+    Ehsan Askari, M.Sc
+    ehsan.askari@usherbrooke.ca
+
+\*---------------------------------------------------------------------------*/
+
+#include "qmom.H"
+#include "addToRunTimeSelectionTable.H"
+#include "zeroGradientFvPatchFields.H"
+#include "populationBalanceModel.H"
+#include "bound.H"
+#include "fvm.H"
+//Added by Ehsan
+#include "twoPhaseSystem.H"
+#include "scalar.H"
+#include "simpleMatrix.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+namespace Foam
+{
+    defineTypeNameAndDebug(qmom, 0);
+    addToRunTimeSelectionTable(populationBalanceReturn, qmom, dictionary);
+
+
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// Construct from dictionary
+qmom::qmom
+(
+	const word& name,
+	populationBalanceModel& populationBalanceModel
+)
+:
+	populationBalanceReturn(name, populationBalanceModel),
+	populationBalanceModel_(populationBalanceModel),
+	alpha_(populationBalanceModel.alpha()),
+
+	dict_
+    (
+        populationBalanceModel_.subDict("qmomCoeffs")
+    ),
+
+	dsauter
+	(
+		IOobject
+		(
+			"dsauter",
+			alpha_.time().timeName(),
+			alpha_.db(),
+			IOobject::MUST_READ,
+			IOobject::AUTO_WRITE
+		),
+		alpha_.mesh()
+	),
+
+	// Sauter diameter d32
+	d32_
+	(
+		IOobject
+		(
+			"d32",
+			alpha_.time().timeName(),
+			alpha_.db(),
+			IOobject::NO_READ,
+			IOobject::NO_WRITE
+		),
+         	alpha_.mesh(),
+		dimensionedScalar("SMALL", dimLength, SMALL)
+	),
+
+  /////////////////////////////////////////////////////////////////
+
+  	m0
+  	(
+  		IOobject
+  		(
+  			"m0",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+
+  	m1
+  	(
+  		IOobject
+  		(
+  			"m1",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+  	m2
+  	(
+  		IOobject
+  		(
+  			"m2",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+  	m3
+  	(
+  		IOobject
+  		(
+  			"m3",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+  	m4
+  	(
+  		IOobject
+  		(
+  			"m4",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+  	m5
+  	(
+  		IOobject
+  		(
+  			"m5",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+  	m6
+  	(
+  		IOobject
+  		(
+  			"m6",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+
+    w1
+  	(
+  		IOobject
+  		(
+  			"w1",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+  	w2
+  	(
+  		IOobject
+  		(
+  			"w2",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+  	w3
+  	(
+  		IOobject
+  		(
+  			"w3",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+       L1
+  	(
+  		IOobject
+  		(
+  			"L1",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+  	L2
+  	(
+  		IOobject
+  		(
+  			"L2",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+  	L3
+  	(
+  		IOobject
+  		(
+  			"L3",
+  			alpha_.time().timeName(),
+  			alpha_.db(),
+  			IOobject::MUST_READ,
+  			IOobject::AUTO_WRITE
+  		),
+  		alpha_.mesh()
+  	),
+
+	residualAlpha_(dict_.lookup("residualAlpha")),
+	m0_(dict_.lookup("m0")),
+	m1_(dict_.lookup("m1")),
+	m2_(dict_.lookup("m2")),
+	m3_(dict_.lookup("m3")),
+	m4_(dict_.lookup("m4")),
+	m5_(dict_.lookup("m5")),
+	m6_(dict_.lookup("m6")),
+	Nm_(readLabel(dict_.lookup("Nm"))),
+        nodes_(readLabel(dict_.lookup("nodes"))),
+       	h0_(dict_.lookup("h0")),
+	hf_(dict_.lookup("hf")),
+	beta1_(dict_.lookup("beta1")),
+	beta2_(dict_.lookup("beta2")),
+	betaPB_(dict_.lookup("betaPB")),
+	k1_(dict_.lookup("k1")),
+	sigma_(dict_.lookup("sigma")),
+	breakCoeff_(dict_.lookup("breakCoeff")),
+	coalCoeff_(dict_.lookup("coalCoeff")),
+	dMin_(dict_.lookup("dMin")),
+	dMax_(dict_.lookup("dMax")),
+	maxIters_(readLabel(dict_.lookup("maxIters"))),
+	loopTolerance_(readScalar(dict_.lookup("loopTolerance")))
+   
+
+
+
+{
+	Info << "Selecting method for population balance model" << endl;
+}
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+qmom::~qmom()
+{}
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+
+void qmom::breakupKernel(PtrList<volScalarField>& S, PtrList<volScalarField>& w, PtrList<volScalarField>& L, const volScalarField& alpha) const
+{
+
+  scalar d_i;
+  scalar d_j;
+
+
+   scalar *diam = new scalar[Nm_+ 1];
+
+
+
+
+      diam[0] = average(L[1]).value();
+      diam[1] = average(L[2]).value();
+      diam[2] = average(L[3]).value();
+
+
+    volScalarField vf = 1.-alpha;
+
+
+   
+for(int k = 0; k <= Nm_-1; k++)
+{
+       
+
+	for (int i = 0; i<= nodes_-1; i++)
+	{
+
+
+  			    d_i = diam[i]/1000;
+			
+
+
+  			for(int j = i+1 ; j <= nodes_-1 ; j++)
+   			{
+			for (int j = 0; j<= nodes_-1; j++)
+			{
+
+
+  				d_j = diam[j]/1000;
+					
+
+
+                   
+
+
+                  S[k]  +=  populationBalanceModel_.rhoa().value()*populationBalanceModel_.breakupModel().breakupRate(vf, d_j, d_i)*w[i+1]
+                      * Foam::pow(2.0,   scalar((3.0-k)/3.0))*Foam::pow(diam[i], k);
+
+
+
+
+  			} 
+			  }
+			 
+
+	}
+
+}
+
+
+for(int k = 0; k <= Nm_-1; k++)
+{
+
+  for (int i = 0; i<= nodes_-1; i++)
+	{
+
+
+  			d_i = diam[i]/1000;
+
+
+  			for(int j = i+1 ; j <= nodes_-1 ; j++)
+   			{
+			  for (int i = 0; i<= nodes_-1; i++)
+				{
+
+  				
+				d_j = diam[i]/1000;
+
+
+                    S[k]  -=   populationBalanceModel_.rhoa().value()*populationBalanceModel_.breakupModel().breakupRate(vf, d_j, d_i)*Foam::pow(diam[i], k)*w[i+1];
+
+
+
+  			}
+		      }
+
+	}
+
+}
+
+
+	return;
+}
+
+void qmom::coalescenceKernel
+(
+	PtrList<volScalarField>& S,
+	PtrList<volScalarField>& w,
+        PtrList<volScalarField>& L,
+	const volScalarField& alpha,
+	const volScalarField& epsilon
+)
+const
+{
+
+  scalar d_i;
+  scalar d_j;
+
+
+
+     scalar *diam = new scalar[Nm_+ 1];
+
+     diam[0] = average(L[1]).value();
+     diam[1] = average(L[2]).value();
+     diam[2] = average(L[3]).value();
+
+
+    volScalarField epsf = epsilon;
+
+
+
+for(int k = 0; k <= Nm_-1; k++)
+{
+
+	
+
+	for (int i = 0; i<=nodes_-1; i++)
+	{
+			  d_i = diam[i]/1000;
+			
+
+
+			for(int  j = 0 ; j <= nodes_-1 ; j++)
+			{
+				d_j = diam[j]/1000;
+				
+
+
+ 
+  
+				S[k] += 0.5*w[i+1]*w[j+1]*Foam::pow ((Foam::pow(diam[i], 3.0)+Foam::pow(diam[j], 3.0)), scalar(k/3.0))*
+						populationBalanceModel_.coalescenceModel().coalescenceRate(d_i,d_j,epsf)*populationBalanceModel_.rhoa().value();
+
+			
+			}
+
+
+	}
+                      
+}
+   
+for(int k = 0; k <= Nm_-1; k++)
+{
+
+
+	for (int i = 0; i<=nodes_-1; i++)
+	{
+			d_i = diam[i]/1000;
+
+
+			for(int  j = 0 ; j <= nodes_-1 ; j++)
+			{
+				d_j = diam[j]/1000;
+
+ 
+                                S[k] -= Foam::pow(diam[i], k)*w[i+1]*w[j+1]
+					*populationBalanceModel_.coalescenceModel().coalescenceRate(d_i,d_j,epsf)*populationBalanceModel_.rhoa().value();
+
+			}
+
+
+	}
+
+
+
+
+}
+
+ 
+	return;
+}
+
+
+void qmom::weightsAbscissas(PtrList<volScalarField>& w, PtrList<volScalarField>& L, PtrList<volScalarField>& m, const volScalarField alpha) const
+{
+  
+  label N=lrint(nodes_);
+  scalar matriceP[N*N][N*N],ai[N*N],bi[N*N];
+  scalar d[N*N],a[N*N][N*N],v[N*N][N*N],alphai[N*N];
+  scalar norm_position[N*N];
+
+
+  forAll(alpha, II)
+  {
+	//- construct the Jacobi matrix P[][] calculation
+	for(label i=1; i<=2*N+1; i++)
+    {
+      if(i==1) {matriceP[i][1]=1.0;}
+      else     {matriceP[i][1]=0.0;}
+    } 
+
+   // position[0][II] = 1.0 ;  // position[0][II] is moment0, which is forced to be unit here
+
+    for(label i=1; i<2*N+1; i++)
+    {
+     norm_position[i-1] = m[i-1][II]/max(m[0][II], 1e-10);
+    } 
+
+    // second column
+    for(label i=1; i<=2*N; i++)
+    {
+         //  matriceP[i][2] = pow(-1,i-1.0)*mag(position[i-1][II]);  
+         //  matriceP[i][2] = pow(-1,i-1.0)*(position[i-1][II]);
+          matriceP[i][2] = pow(-1,i-1.0)*norm_position[i-1];
+    }
+     
+
+
+    //rest of the column   
+    for(label j=3; j<= 2*N+1; j++)
+    {
+       for(label i=1; i<= 2*N+2-j; i++)   
+       {
+	matriceP[i][j] = matriceP[1][j-1]*matriceP[i+1][j-2]-matriceP[1][j-2]*matriceP[i+1][j-1];
+                                 
+       }
+                     
+
+    } 
+       
+
+// calculation of alphai[i]  
+    alphai[1]=0.0; // Zeta1 =0.0
+    for(label i=2; i<= 2*N; i++)
+    {
+       	alphai[i] = matriceP[1][i+1]/(matriceP[1][i]*matriceP[1][i-1]+SMALL);
+      // alphai[i] = matriceP[1][i+1]/(matriceP[1][i]*matriceP[1][i-1]+SMALL); 
+       // Info << "matriceP[1][i]" << matriceP[1][i] << endl;
+       // Info << "matriceP[1][i-1]" << matriceP[1][i-1] << endl;
+       // Info << "teste" << matriceP[1][i]*matriceP[1][i-1]+SMALL << endl;
+    }
+    
+    //- calculation of coefficients a[i] and b[i]
+    for(label i=1; i<=N; i++)
+    {
+		ai[i] = alphai[2*i] + alphai[2*i-1]; 
+    }
+          /* Info << "ai1" << "\t" << ai[1] << endl;
+           Info << "ai2" << "\t" << ai[2] << endl;
+           Info << "ai3" << "\t" << ai[3] << endl;*/
+
+
+    for(label i=1; i<= N-1; i++)
+    {
+		bi[i] = Foam::sqrt(mag(alphai[2*i+1]*alphai[2*i])); // positive root
+                //bt[i] = -Foam::sqrt(alphai[2*i+1]*alphai[2*i]); // positive root
+    } 
+
+          
+          // Info << "bi1" << "\t" << bi[1] << endl;
+          // Info << "bi2" << "\t" << bi[2] << endl;
+  
+	//- eigenValues and eigenVector for the Jacobi matrice 
+	// Diagonal of symmetric tridiagonal matrice
+	for (label i=1;i<=N;i++)
+	{
+      a[i][i]   = ai[i];
+	}  
+	
+	// Subdiagonal of symmetric tridiagonal matrix
+	for (label i=1;i<N;i++)
+	{
+      a[i+1][i] = a[i][i+1] = bi[i];
+	}  
+      a[3][1]=a[1][3]=1e-10; // before it was 0.
+  
+	// tensor definition
+	tensor ABC;
+	tensor evs; 
+  
+	// filling the tensor ABC
+	// WARNING ! max N=3 (nodes of quadrature)
+	ABC.xx()=a[1][1]; ABC.xy()=a[1][2]; ABC.xz()=a[1][3]; 
+	ABC.yx()=a[2][1]; ABC.yy()=a[2][2]; ABC.yz()=a[2][3];
+	ABC.zx()=a[3][1]; ABC.zy()=a[3][2]; ABC.zz()=a[3][3];
+
+	// calculating eigenvalues 
+	vector e_values=eigenValues(ABC);
+
+	// calculating eigenvector 
+	evs = eigenVectors(ABC); 
+
+	// allocation of the eigenvector
+	v[1][1] = evs.xx(); 
+	v[1][2] = evs.yx();
+	v[1][3] = evs.zx(); 
+
+/*Info << "v11" << "\t" << v[1][1] << endl;
+Info << "v12" << "\t" << v[1][2] << endl;
+Info << "v13" << "\t" << v[1][3] << endl;*/
+
+	// allocation of the eigenvalues
+	d[1] = e_values.x(); 
+	d[2] = e_values.y();
+	d[3] = e_values.z();
+
+/*Info << "EigenVa1" << "\t" << d[1] << endl;
+Info << "EigenVa2" << "\t" << d[2] << endl;
+Info << "EigenVa3" << "\t" << d[3] << endl;*/
+
+   //- final allocation
+	for(int i=1; i<=N; i++)
+	{
+      // Weights (W) are the first component of eigenVectors 
+          //   W[i][II] = mag(position[0][II]*sqr(v[1][i]));
+         //  W[i][II] = mag(sqr(v[1][i]));
+       //   if(W[i][II] <= 0 || W[i][II] > 1) W[i][II]=moment0[II];     
+
+         w[i][II] = m[0][II]*sqr(v[1][i]);
+
+             if(w[i][II] < 0)
+             {
+                w[i][II]=0.0;
+             }           
+         
+      // Abscissas (L) are the eigenValues
+      L[i][II] = fabs(d[i]);
+      
+
+  
+	} // end loop i
+    
+    
+  } // end loop forALL
+
+
+
+  return;
+}
+
+
+
+tmp<volScalarField> qmom::SauterDiameter(PtrList<volScalarField>& m, const volScalarField& alpha) const
+{
+  const fvMesh& mesh = alpha_.mesh();
+
+
+  volScalarField result
+  (
+			IOobject
+			(
+				"result",
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::NO_WRITE
+			),
+			  alpha
+                         // dsauter
+
+  );
+
+
+
+  // partial result of Sauter diameter d32
+    result = m[3]/(m[2]+SMALL)/1000.0;
+ //   result = m[4]/(m[3]+SMALL)/1000.0;
+
+
+
+  forAll(result, cellI)
+  {
+
+	 if(alpha[cellI] > residualAlpha_.value())
+	  {
+		
+				result[cellI] = max(dMin_.value(), min(result[cellI], dMax_.value()));
+			
+	  }
+	  else
+	  {
+			   result[cellI] = dMin_.value();
+	  }
+
+  }
+
+  return tmp<volScalarField>
+  (
+		new volScalarField
+		(
+			IOobject
+			(
+				"d32",
+				mesh.time().timeName(),
+				mesh,
+				IOobject::NO_READ,
+				IOobject::AUTO_WRITE
+			),
+			result
+		)
+  );
+
+
+
+}
+
+
+
+void qmom::adjust(PtrList<volScalarField>& S, PtrList<volScalarField>& L,const volScalarField& alpha) const
+{
+
+	for(int j=0; j<=Nm_-1; j++)
+   {
+      forAll(S[j], II)
+		{
+			S[j][II]=0;
+		}
+   }
+
+   //limitation to 10 mm of diameter
+   for(int i=0; i<=nodes_; i++)
+    {
+             forAll(L[i], II)
+           {
+                if(L[i][II] > 10)
+                {
+                L[i][II] = 10;
+                }
+           }
+    }
+
+
+
+}
+
+
+
+// *******************************************************************************************************************************
+
+// calculacte and correct variables
+void qmom::correct()
+{
+  const fvMesh& mesh = alpha_.mesh();
+
+
+ PtrList<volScalarField> source(2*Nm_);
+ PtrList<volScalarField> m(2*Nm_);
+ PtrList<volScalarField> mStar(2*Nm_);
+ PtrList<volScalarField> w(2*nodes_);
+ PtrList<volScalarField> L(2*nodes_);
+
+
+  volScalarField source_ini =
+    mesh.objectRegistry::lookupObject<volScalarField>("source_ini");
+
+  volScalarField m_ini =
+    mesh.objectRegistry::lookupObject<volScalarField>("m_ini");
+
+  volScalarField w_ini =
+    mesh.objectRegistry::lookupObject<volScalarField>("w_ini");
+
+  volScalarField L_ini =
+    mesh.objectRegistry::lookupObject<volScalarField>("L_ini");
+
+
+
+
+  for(label j=0;j<=Nm_;j++)
+	 {
+		 word sourceName = "Sb_" + Foam::name(j);
+		 word fName = "m_" + Foam::name(j);
+                 word fSName = "mStar_" + Foam::name(j);
+
+
+		 source.set
+		 ( j,
+	      volScalarField
+	      (
+	         IOobject
+	         (
+				    sourceName,
+					 mesh.time().timeName(),
+					 mesh,
+					 IOobject::NO_READ,
+				         IOobject::AUTO_WRITE
+			   ),
+	         source_ini
+	      )
+	    );
+
+		 m.set
+		 ( j,
+	      volScalarField
+	      (
+	         IOobject
+	         (
+				    fName,
+					 mesh.time().timeName(),
+					 mesh,
+					 IOobject::NO_READ,
+				         IOobject::AUTO_WRITE
+			   ),
+                m_ini
+	      )
+	    );
+
+		 mStar.set
+		 ( j,
+	      volScalarField
+	      (
+	         IOobject
+	         (
+				    fSName,
+					 mesh.time().timeName(),
+					 mesh,
+					 IOobject::NO_READ,
+				         IOobject::AUTO_WRITE
+			   ),
+                m_ini
+	      )
+	    );
+
+	 }
+
+   for(label j=0;j<=nodes_;j++)
+ 	 {
+ 		 word wName = "w_" + Foam::name(j);
+ 		 word LName = "L_" + Foam::name(j);
+
+
+ 		 w.set
+ 		 ( j,
+ 	      volScalarField
+ 	      (
+ 	         IOobject
+ 	         (
+ 				    wName,
+ 					 mesh.time().timeName(),
+ 					 mesh,
+ 					 IOobject::NO_READ,
+ 				  IOobject::AUTO_WRITE
+ 			   ),
+ 	         w_ini
+ 	      )
+ 	    );
+
+ 		 L.set
+ 		 ( j,
+ 	      volScalarField
+ 	      (
+ 	         IOobject
+ 	         (
+ 				    LName,
+ 					 mesh.time().timeName(),
+ 					 mesh,
+ 					 IOobject::NO_READ,
+ 				   IOobject::AUTO_WRITE
+ 			   ),
+                 L_ini
+ 	      )
+ 	    );
+
+ 	 }
+
+   m.set
+   ( 0,
+    volScalarField
+    (
+       IOobject
+       (
+        "m0",
+
+                   alpha_.time().timeName(),
+                   alpha_.db(),
+       IOobject::NO_READ,
+             IOobject::NO_WRITE
+     ),
+            m0
+    )
+   );
+   m.set
+   ( 1,
+    volScalarField
+    (
+       IOobject
+       (
+        "m1",
+
+                   alpha_.time().timeName(),
+                   alpha_.db(),
+       IOobject::NO_READ,
+             IOobject::NO_WRITE
+     ),
+            m1
+    )
+   );
+   m.set
+   ( 2,
+    volScalarField
+    (
+       IOobject
+       (
+        "m2",
+
+                   alpha_.time().timeName(),
+                   alpha_.db(),
+       IOobject::NO_READ,
+             IOobject::NO_WRITE
+     ),
+            m2
+    )
+   );
+   m.set
+   ( 3,
+    volScalarField
+    (
+       IOobject
+       (
+        "m3",
+
+                   alpha_.time().timeName(),
+                   alpha_.db(),
+       IOobject::NO_READ,
+             IOobject::NO_WRITE
+     ),
+            m3
+    )
+   );
+   m.set
+   ( 4,
+    volScalarField
+    (
+       IOobject
+       (
+        "m4",
+
+                   alpha_.time().timeName(),
+                   alpha_.db(),
+       IOobject::NO_READ,
+             IOobject::NO_WRITE
+     ),
+            m4
+    )
+   );
+   m.set
+   ( 5,
+    volScalarField
+    (
+       IOobject
+       (
+        "m5",
+
+                   alpha_.time().timeName(),
+                   alpha_.db(),
+       IOobject::NO_READ,
+             IOobject::NO_WRITE
+     ),
+            m5
+    )
+   );
+   m.set
+   ( 6,
+    volScalarField
+    (
+       IOobject
+       (
+        "m6",
+
+                   alpha_.time().timeName(),
+                   alpha_.db(),
+       IOobject::NO_READ,
+             IOobject::NO_WRITE
+     ),
+            m6
+    )
+   );
+
+L.set
+( 1,
+ volScalarField
+ (
+    IOobject
+    (
+     "L1",
+
+                alpha_.time().timeName(),
+                alpha_.db(),
+    IOobject::NO_READ,
+          IOobject::NO_WRITE
+  ),
+         L1
+ )
+);
+L.set
+( 2,
+ volScalarField
+ (
+    IOobject
+    (
+     "L2",
+
+                alpha_.time().timeName(),
+                alpha_.db(),
+    IOobject::NO_READ,
+          IOobject::NO_WRITE
+  ),
+         L2
+ )
+);
+L.set
+( 3,
+ volScalarField
+ (
+    IOobject
+    (
+     "L3",
+
+                alpha_.time().timeName(),
+                alpha_.db(),
+    IOobject::NO_READ,
+          IOobject::NO_WRITE
+  ),
+         L3
+ )
+);
+w.set
+( 1,
+ volScalarField
+ (
+    IOobject
+    (
+     "w1",
+
+                alpha_.time().timeName(),
+                alpha_.db(),
+    IOobject::NO_READ,
+          IOobject::NO_WRITE
+  ),
+         w1
+ )
+);
+w.set
+( 2,
+ volScalarField
+ (
+    IOobject
+    (
+     "w2",
+
+                alpha_.time().timeName(),
+                alpha_.db(),
+    IOobject::NO_READ,
+          IOobject::NO_WRITE
+  ),
+         w2
+ )
+);
+
+
+w.set
+( 3,
+ volScalarField
+ (
+    IOobject
+    (
+     "w3",
+
+                alpha_.time().timeName(),
+                alpha_.db(),
+    IOobject::NO_READ,
+          IOobject::NO_WRITE
+  ),
+         w3
+ )
+);
+
+
+//m[0]=m0_.value();m[1]=m1_.value();m[2]=m2_.value();m[3]=m3_.value();m[4]=m4_.value();m[5]=m5_.value();m[6]=m6_.value();//sigmaNDF=sigmaNDF_.value();
+
+m[0]=m0;m[1]=m1;m[2]=m2;m[3]=m3;m[4]=m4;m[5]=m5;
+w[1]=w1;w[2]=w2;w[3]=w3;
+L[1]=L1;L[2]=L2;L[3]=L3;
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+  volScalarField alpha =
+    mesh.objectRegistry::lookupObject<volScalarField>("alpha.air");
+
+  volScalarField epsilon =
+   mesh.objectRegistry::lookupObject<volScalarField>("epsilon.water");
+
+
+  surfaceScalarField phia =
+    mesh.objectRegistry::lookupObject<surfaceScalarField>("phi.air");
+
+
+
+		 qmom::adjust(source,L,alpha);
+
+
+
+
+/************************************************************************************************************/
+
+ //               qmom::weightsAbscissas(w,L,m,alpha);
+
+ 		                    
+
+ 		
+                   for(label i=0;i<Nm_-1;i++)
+	
+
+		{
+			// update bubbles breakage/coalescence
+
+
+                        qmom::adjust(source,L,alpha);
+
+	                qmom::coalescenceKernel(source,w,L,alpha,epsilon);
+           
+
+
+	  		qmom::breakupKernel(source,w,L,alpha);
+
+
+
+	           	volScalarField Sb = source[i]/
+		                            populationBalanceModel_.breakupModel().rhoa();
+
+
+   
+
+			     word fScheme("div(phia,mi)"); //Vase inke pointerlist darim vase m[i] az een estafe kardim
+
+	
+			     fvScalarMatrix miEqn
+			     (
+
+				  fvm::ddt(m[i])
+				+ fvm::div(phia, m[i], fScheme)
+				- fvm::Sp(fvc::div(phia), m[i])
+
+
+			     );
+
+
+
+/*
+
+     fvScalarMatrix miEqn
+     (
+
+         fvm::ddt(m[i])
+
+
+
+     );
+*/				solve(miEqn == Sb);
+      
+
+
+	
+		}
+
+
+
+	m[0]=mag(m[0]);
+	m[1]=mag(m[1]);
+	m[2]=mag(m[2]);
+	m[3]=mag(m[3]);
+	m[4]=mag(m[4]);
+	m[5]=mag(m[5]);
+	m[6]=mag(m[6]);
+
+
+
+
+
+       qmom::weightsAbscissas(w,L,m,alpha);
+
+
+
+       qmom::adjust(source,L,alpha);
+
+ 
+    
+    
+  
+    
+
+	// update Sauter diameter d32, relax and correct BC
+        dsauter = SauterDiameter(m,alpha);
+
+
+
+
+	d32_ = SauterDiameter(m,alpha)*dimensionedScalar
+			(
+			   "one",
+			   dimLength,
+			   1.
+			);
+
+        dsauter.relax();
+        dsauter.correctBoundaryConditions();
+
+
+        d32_.relax();
+        d32_.correctBoundaryConditions();
+
+	m0=m[0];m1=m[1];m2=m[2];m3=m[3];m4=m[4];m5=m[5];
+	w1=w[1];w2=w[2];w3=w[3];
+	L1=L[1];L2=L[2];L3=L[3];
+
+
+
+}
+
+// update final calculation
+
+
+
+
+
+
+void qmom::updateSauterDiameter()
+{
+   // mesh declaration
+
+
+
+
+   Info << nl << " *********************************************************************** "<< endl;
+   Info << nl << "           Updating Sauter diameter d32 by using " << populationBalanceReturn::name() << endl;
+   Info << nl << "           min/avg/max d32: " << min(dsauter).value()*1000
+              << "/" << average(dsauter).value()*1000<< "/" << max(dsauter).value()*1000<< "mm." << endl;
+   Info << nl << " *********************************************************************** "<< endl;
+	Info << " " << endl;
+}
+
+
+} // end of namespace
+// **************************************************************************************************************************** //

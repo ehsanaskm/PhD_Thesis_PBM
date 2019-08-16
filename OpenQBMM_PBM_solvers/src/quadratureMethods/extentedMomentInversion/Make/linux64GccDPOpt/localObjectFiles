@@ -1,0 +1,6 @@
+LOCAL_OBJECTS = \
+extendedMomentInversion.o\
+newExtendedMomentInversion.o\
+gammaEQMOM.o\
+lognormalEQMOM.o\
+betaEQMOM.o

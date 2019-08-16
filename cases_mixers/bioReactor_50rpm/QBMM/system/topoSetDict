@@ -1,0 +1,114 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      topoSetDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+
+    {
+        name    MRFZone;
+        type    cellSet;
+        action  new;
+        source  zoneToCell;
+        sourceInfo
+        {
+            name MRFZone;
+        }
+    }
+
+    {
+        name    belowRotor;
+        type    cellSet;
+        action  new;
+        source cylinderToCell;
+	    sourceInfo
+	    {
+	       p1       (0 0 0); // start point on cylinder axis
+	       p2       (0 0 0.05);   // end point on cylinder axis
+	       radius   0.06;
+	    }
+    }
+
+    // Lower center
+    {
+        name    lowerInnerCenter;
+        type    cellSet;
+        action  new;
+        source cylinderToCell;
+	    sourceInfo
+	    {
+	       p1       (0 0 0); // start point on cylinder axis
+	       p2       (0 0 0.05);   // end point on cylinder axis
+	       radius   0.0375;
+	    }
+    }
+    // Lower outer center
+    {
+        name    lowerOuterCenter;
+        type    cellSet;
+        action  new;
+        source  cellToCell;
+        sourceInfo
+        {
+            set belowRotor;
+        }
+    }
+    {
+        name    lowerOuterCenter;
+        type    cellSet;
+        action  delete;
+        source  cellToCell;
+        sourceInfo
+        {
+            set lowerInnerCenter;
+        }
+    }
+
+    {
+        name    aboveRotor;
+        type    cellSet;
+        action  new;
+        source cylinderToCell;
+	    sourceInfo
+	    {
+	       p1       (0 0 0.05); // start point on cylinder axis
+	       p2       (0 0 0.166);   // end point on cylinder axis // 0.195
+	       radius   0.06; // 0.0975
+	    }
+    }
+    
+    
+    {
+        name    waterZone;
+        type    cellSet;
+        action  new;
+        source cylinderToCell;
+	    sourceInfo
+	    {
+	       p1       (0 0 0); // start point on cylinder axis
+	       p2       (0 0 0.166);   // end point on cylinder axis // 0.195
+	       radius   0.0625; // 0.0975
+	    }
+    }
+
+
+
+);
+
+
+
+
+// ************************************************************************* //

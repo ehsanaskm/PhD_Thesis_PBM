@@ -1,0 +1,14 @@
+LOCAL_OBJECTS = \
+mixingModel.o\
+newMixingModel.o\
+diffusionModel.o\
+newDiffusionModel.o\
+noDiffusion.o\
+turbulentDiffusion.o\
+molecularDiffusion.o\
+mixingKernel.o\
+newMixingKernel.o\
+IEM.o\
+FokkerPlanck.o\
+noMixing.o\
+turbulentMixing.o

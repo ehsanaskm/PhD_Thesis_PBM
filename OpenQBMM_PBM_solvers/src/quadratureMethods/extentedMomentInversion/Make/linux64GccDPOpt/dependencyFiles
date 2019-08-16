@@ -1,0 +1,6 @@
+DEPENDENCIES = \
+extendedMomentInversion/extendedMomentInversion.dep\
+extendedMomentInversion/newExtendedMomentInversion.dep\
+gamma/gammaEQMOM.dep\
+lognormal/lognormalEQMOM.dep\
+beta/betaEQMOM.dep

@@ -1,0 +1,61 @@
+# 1 "files"
+# 1 "<built-in>"
+# 1 "<command-line>"
+
+
+
+
+# 1 "/usr/include/stdc-predef.h" 1 3 4
+
+# 17 "/usr/include/stdc-predef.h" 3 4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 4 "<command-line>" 2
+# 1 "files"
+extendedMomentInversion/extendedMomentInversion.C
+extendedMomentInversion/newExtendedMomentInversion.C
+gamma/gammaEQMOM.C
+lognormal/lognormalEQMOM.C
+beta/betaEQMOM.C
+
+LIB = $(FOAM_USER_LIBBIN)/libextendedMomentInversion

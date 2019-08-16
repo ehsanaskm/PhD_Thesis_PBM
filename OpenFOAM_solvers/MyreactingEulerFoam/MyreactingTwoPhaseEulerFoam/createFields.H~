@@ -1,0 +1,158 @@
+#include "readGravitationalAcceleration.H"
+#include "readhRef.H"
+
+
+volScalarField m1
+(
+    IOobject
+    (
+        "m1",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
+
+
+volScalarField m0
+(
+    IOobject
+    (
+        "m0",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
+volScalarField d32
+(
+    IOobject
+    (
+        "d32",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    //alpha1*dimensionedScalar("One", dimensionSet(0,1,0,0,0,0,0), 1)
+        mesh
+);
+
+d32=max(m1/(m0+dimensionedScalar("SMALL", dimensionSet(0,-3,0,0,0,0,0), SMALL))/1000, dimensionedScalar("Min", dimLength, 0.0001));
+
+volScalarField KLa
+(
+    IOobject
+    (
+        "KLa",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
+volVectorField Ua
+(
+    IOobject
+    (
+        "Ua",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+volVectorField Ub
+(
+    IOobject
+    (
+        "Ub",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+volVectorField Uslip
+(
+    IOobject
+    (
+        "Uslip",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    Ua-Ub
+);
+
+Info<< "Creating phaseSystem\n" << endl;
+
+autoPtr<twoPhaseSystem> fluidPtr
+(
+    twoPhaseSystem::New(mesh)
+);
+twoPhaseSystem& fluid = fluidPtr();
+
+dimensionedScalar pMin
+(
+    "pMin",
+    dimPressure,
+    fluid
+);
+
+#include "gh.H"
+
+volScalarField& p = fluid.phase1().thermo().p();
+
+Info<< "Reading field p_rgh\n" << endl;
+volScalarField p_rgh
+(
+    IOobject
+    (
+        "p_rgh",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
+label pRefCell = 0;
+scalar pRefValue = 0.0;
+setRefCell
+(
+    p,
+    p_rgh,
+    pimple.dict(),
+    pRefCell,
+    pRefValue
+);
+mesh.setFluxRequired(p_rgh.name());
+
+
+volScalarField Y_O2_P
+(
+    IOobject
+    (
+        "Y_O2_P",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
+

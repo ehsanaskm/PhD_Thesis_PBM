@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.0                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       polyBoundaryMesh;
+    location    "0.0001/polyMesh";
+    object      boundary;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+6
+(
+    stator
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          20885;
+        startFace       1321640;
+    }
+    rotor
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          5193;
+        startFace       1342525;
+    }
+    top
+    {
+        type            patch;
+        nFaces          4284;
+        startFace       1347718;
+    }
+    spargerInlet
+    {
+        type            patch;
+        nFaces          392;
+        startFace       1352002;
+    }
+    spargerWall
+    {
+        type            wall;
+        inGroups        1(wall);
+        nFaces          568;
+        startFace       1352394;
+    }
+    shaft
+    {
+        type            patch;
+        nFaces          3444;
+        startFace       1352962;
+    }
+)
+
+// ************************************************************************* //

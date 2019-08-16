@@ -1,0 +1,6 @@
+OBJECTS = \
+$(OBJECTS_DIR)/extendedMomentInversion.o\
+$(OBJECTS_DIR)/newExtendedMomentInversion.o\
+$(OBJECTS_DIR)/gammaEQMOM.o\
+$(OBJECTS_DIR)/lognormalEQMOM.o\
+$(OBJECTS_DIR)/betaEQMOM.o

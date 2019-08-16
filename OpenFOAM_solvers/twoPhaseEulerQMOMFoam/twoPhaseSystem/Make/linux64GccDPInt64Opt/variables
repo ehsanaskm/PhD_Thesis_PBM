@@ -1,0 +1,4 @@
+populationBalanceModel = diameterModels/populationBalanceModel
+breakupLaws = $(populationBalanceModel)/breakupLaws
+coalescenceLaws = $(populationBalanceModel)/coalescenceLaws
+LIB = $(FOAM_USER_LIBBIN)/libcompressibleTwoPhaseSystem3

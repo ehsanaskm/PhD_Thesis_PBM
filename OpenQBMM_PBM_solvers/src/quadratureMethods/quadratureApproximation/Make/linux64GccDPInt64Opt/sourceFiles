@@ -1,0 +1,2 @@
+SOURCE = \
+univariateQuadratureApproximation/univariateQuadratureApproximation.C 

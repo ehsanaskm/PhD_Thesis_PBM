@@ -1,0 +1,89 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  dev                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      populationaBalanceProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+populationBalanceModel univariate;
+
+univariateCoeffs
+{
+    aggregation on;
+
+    aggregationKernel
+    {
+      //  aggregationKernel turbulentBrownian;
+         aggregationKernel luoModel;
+	rhob        rhob [1 -3 0 0 0 0 0] 	 1000.0;		// liquid density 
+	rhoa	    rhoa [1 -3 0 0 0 0 0] 	 1.2;			// gas density
+	sigma       sigma [1 0 -2 0 0 0 0]   0.07;
+
+    }
+
+    breakup on;
+
+    breakupKernel
+    {
+       // breakupKernel LuoSvendsen;
+
+        breakupKernel luoModel;
+        Cb        Cb        [ 0 0 -1 0 0 0 0 ] 0.02;
+
+    //   Cb        Cb        [ 0  0 0 0 0 0 ] 1.0e-3;
+    //    epsilonExp          0.75;
+      //  nuExp              -1.25;
+        //sizeExp             1.0;
+
+	rhob        rhob [1 -3 0 0 0 0 0] 	 1000.0;		// liquid density 
+	rhoa	    rhoa [1 -3 0 0 0 0 0] 	 1.2;			// gas density
+	sigma       sigma [1 0 -2 0 0 0 0]   0.07;		// surface tension liquid-ga
+	k           k [0 0 0 0 0 0 0] 		 0.9238;		// model parameter				
+	beta       			  2.12; 
+      //  residualAlpha  	residualAlpha [0 0 0 0 0 0 0] 1e-4;
+    }
+
+    daughterDistribution
+    {
+        daughterDistribution symmetricFragmentation;
+    }
+
+    diffusionModel
+    {
+        diffusionModel none;
+        gammaLam        gammaLam    [ 0 2 -1 0 0 0 0 ] 0.0001;
+        Sc              0.7;
+    }
+
+    growth off;
+
+    growthModel
+    {
+        growthModel	constant;
+        minAbscissa     minAbscissa [0 -2 0 0 0 0 0] 0.0;
+        maxAbscissa     maxAbscissa [0 -2 0 0 0 0 0] 1.0;
+
+        Cg        Cg        [0 3 -1 0 0 0 0 ] 1.0;
+    }
+
+    nucleationModel
+    {
+        nucleationModel  none;
+    }
+}
+
+
+
+
+
+// ************************************************************************* //

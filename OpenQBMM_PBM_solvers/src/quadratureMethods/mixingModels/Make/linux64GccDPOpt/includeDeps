@@ -1,0 +1,13 @@
+include mixingModel/mixingModel.dep
+include mixingModel/newMixingModel.dep
+include mixingSubModels/diffusionModels/diffusionModel/diffusionModel.dep
+include mixingSubModels/diffusionModels/diffusionModel/newDiffusionModel.dep
+include mixingSubModels/diffusionModels/noDiffusion/noDiffusion.dep
+include mixingSubModels/diffusionModels/turbulentDiffusion/turbulentDiffusion.dep
+include mixingSubModels/diffusionModels/molecularDiffusion/molecularDiffusion.dep
+include mixingSubModels/mixingKernels/mixingKernel/mixingKernel.dep
+include mixingSubModels/mixingKernels/mixingKernel/newMixingKernel.dep
+include mixingSubModels/mixingKernels/IEM/IEM.dep
+include mixingSubModels/mixingKernels/FokkerPlanck/FokkerPlanck.dep
+include noMixing/noMixing.dep
+include turbulentMixing/turbulentMixing.dep

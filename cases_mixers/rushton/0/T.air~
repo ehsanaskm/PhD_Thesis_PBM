@@ -1,0 +1,51 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    class       volScalarField;
+    location    "0";
+    object      T.air;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 300;
+
+boundaryField
+{
+    stator
+    {
+        type            zeroGradient;
+    }
+    rotor
+    {
+        type            zeroGradient;
+    }
+    top
+    {
+        type               inletOutlet;
+        phi                phi.air;
+        inletValue         $internalField;
+        value              $internalField;
+    }
+    spargerWall
+    {
+        type            zeroGradient;
+    }
+    spargerInlet
+    {
+        type               fixedValue;
+        value              $internalField;
+    }
+}
+
+
+// ************************************************************************* //

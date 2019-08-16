@@ -1,0 +1,76 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    class       volVectorField;
+    location    "0";
+    object      U.water;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    stator
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    rotor
+    {
+
+        type            fixedValue;
+        value           uniform (0 0 0);
+/*
+        type            cylindricalInletVelocity;
+        axis            (0 0 1);
+        centre          (0 0 0.1);
+        axialVelocity   constant 0;
+        radialVelocity  constant 0;
+        rpm             constant 10;
+        value uniform   (1e-15 0.000145 1e-15); 
+*/
+    }
+    spargerInlet
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    spargerWall
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+    top
+    {
+        type            inletOutlet;
+        inletValue      uniform (0 0 0);
+        value           uniform (0 0 0);
+/*
+        type               pressureInletOutletVelocity;
+        phi                phi.water;
+        value              $internalField;
+*/
+    }
+
+    shaft
+    {
+        type            rotatingWallVelocity;
+        origin          (0 0 0);
+        axis            (0 0 1);
+        omega           5;
+    }
+}
+
+
+// ************************************************************************* //

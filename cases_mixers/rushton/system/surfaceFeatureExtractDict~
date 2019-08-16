@@ -1,0 +1,65 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      surfaceFeatureExtractDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+InletTop.stl
+{
+    extractionMethod    extractFromSurface; // extractFromFile or extractFromSurface
+    extractFromSurfaceCoeffs
+    {includedAngle   150;}
+    writeObj                yes;    // Write options
+}
+
+Outlet.stl 
+{
+    extractionMethod    extractFromSurface; // extractFromFile or extractFromSurface
+    extractFromSurfaceCoeffs
+    {includedAngle   150;}
+    writeObj                yes;    // Write options
+}
+
+ReactorWalls.stl
+{
+    extractionMethod    extractFromSurface; // extractFromFile or extractFromSurface
+    extractFromSurfaceCoeffs
+    {includedAngle   150;}
+    writeObj                yes;    // Write options
+}
+
+SpargerWalls.stl
+{
+    extractionMethod    extractFromSurface; // extractFromFile or extractFromSurface
+    extractFromSurfaceCoeffs
+    {includedAngle   150;}
+    writeObj                yes;    // Write options
+}
+
+Impeller.stl
+{
+    extractionMethod    extractFromSurface; // extractFromFile or extractFromSurface
+    extractFromSurfaceCoeffs
+    {includedAngle   150;}
+    writeObj                yes;    // Write options
+}
+
+MRFzone.stl
+{
+    extractionMethod    extractFromSurface; // extractFromFile or extractFromSurface
+    extractFromSurfaceCoeffs
+    {includedAngle   150;}
+    writeObj                yes;    // Write options
+}
+
+// ************************************************************************* //

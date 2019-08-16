@@ -1,0 +1,35 @@
+SOURCE = \
+phaseModel/phaseModel.C \
+diameterModels/diameterModel/diameterModel.C \
+diameterModels/diameterModel/newDiameterModel.C \
+diameterModels/constantDiameter/constantDiameter.C \
+diameterModels/isothermalDiameter/isothermalDiameter.C \
+diameterModels/PBM/PBM.C \
+diameterModels/IATE/IATE.C \
+diameterModels/IATE/IATEsources/IATEsource/IATEsource.C \
+diameterModels/IATE/IATEsources/wakeEntrainmentCoalescence/wakeEntrainmentCoalescence.C \
+diameterModels/IATE/IATEsources/turbulentBreakUp/turbulentBreakUp.C \
+diameterModels/IATE/IATEsources/randomCoalescence/randomCoalescence.C \
+$(populationBalanceModel)/populationBalanceModel.C \
+$(populationBalanceModel)/populationBalanceReturnMethods/populationBalanceReturn/populationBalanceReturn.C \
+$(populationBalanceModel)/populationBalanceReturnMethods/populationBalanceReturn/newpopulationBalanceReturn.C \
+$(populationBalanceModel)/incompleteGammaFunction/incompleteGammaFunction.C \
+$(breakupLaws)/breakupLaw/breakupLaw.C \
+$(breakupLaws)/breakupLaw/newbreakupModels.C \
+$(breakupLaws)/LuoAndSvendsenBreak/LuoAndSvendsenBreak.C \
+$(breakupLaws)/ConstantBreak/ConstantBreak.C \
+$(coalescenceLaws)/coalescenceLaw/coalescenceLaw.C \
+$(coalescenceLaws)/coalescenceLaw/newcoalescenceModels.C \
+$(coalescenceLaws)/LuoAndSvendsenCoal/LuoAndSvendsenCoal.C \
+$(coalescenceLaws)/Constant/Constant.C \
+$(populationBalanceModel)/populationBalanceReturnMethods/classMethod/classMethod.C \
+$(populationBalanceModel)/populationBalanceReturnMethods/qmom/qmom.C \
+BlendedInterfacialModel/blendingMethods/blendingMethod/blendingMethod.C \
+BlendedInterfacialModel/blendingMethods/blendingMethod/newBlendingMethod.C \
+BlendedInterfacialModel/blendingMethods/noBlending/noBlending.C \
+BlendedInterfacialModel/blendingMethods/linear/linear.C \
+BlendedInterfacialModel/blendingMethods/hyperbolic/hyperbolic.C \
+phasePair/phasePairKey/phasePairKey.C \
+phasePair/phasePair/phasePair.C \
+phasePair/orderedPhasePair/orderedPhasePair.C \
+twoPhaseSystem.C 

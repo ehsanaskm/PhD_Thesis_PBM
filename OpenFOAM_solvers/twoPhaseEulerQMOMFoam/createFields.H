@@ -1,0 +1,203 @@
+#include "readGravitationalAcceleration.H"
+#include "readhRef.H"
+
+Info<< "Creating twoPhaseSystem\n" << endl;
+
+twoPhaseSystem fluid(mesh, g);
+
+phaseModel& phase1 = fluid.phase1();
+phaseModel& phase2 = fluid.phase2();
+
+volScalarField& alpha1 = phase1;
+volVectorField& U1 = phase1.U();
+volVectorField& U2 = phase2.U();
+
+volScalarField& p = phase1.thermo().p();
+
+dimensionedScalar pMin
+(
+    "pMin",
+    dimPressure,
+    fluid
+);
+
+#include "gh.H"
+
+Info<< "Reading field p_rgh\n" << endl;
+volScalarField p_rgh
+(
+    IOobject
+    (
+        "p_rgh",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
+volVectorField U
+(
+    IOobject
+    (
+        "U",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    fluid.U()
+);
+
+label pRefCell = 0;
+scalar pRefValue = 0.0;
+setRefCell
+(
+    p,
+    p_rgh,
+    pimple.dict(),
+    pRefCell,
+    pRefValue
+);
+mesh.setFluxRequired(p_rgh.name());
+mesh.setFluxRequired(alpha1.name());
+
+    Info<< "Creating field kinetic energy k\n" << endl;
+    volScalarField k("k", 0.5*magSqr(U));
+
+    scalar Cmu=0.09;
+    scalar dh = 0.1;
+
+    Info<< "Creating field dissipation of kinetic energy epsilon\n" << endl;
+	 volScalarField epsilon
+    (
+        IOobject
+        (
+            "epsilon",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar
+        (
+				"epsilon",
+				sqr(dimLength)/pow3(dimTime),
+				Foam::pow(Cmu,3./4.)*Foam::pow(max(k).value(), 3./2.)/0.007/dh
+		  )
+    );
+
+	 // ********************************************************************************************
+	 // Ehsan Askari ,
+	 // declaration of population balance packages
+	 // ********************************************************************************************
+
+	 volScalarField source_ini
+	 (
+	     IOobject
+	     (
+			   "source_ini",
+				runTime.timeName(),
+				mesh,
+				IOobject::MUST_READ,
+				IOobject::AUTO_WRITE
+		  ),
+	     mesh
+	 );
+
+   volScalarField m_ini
+   (
+       IOobject
+       (
+         "m_ini",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+      ),
+       mesh
+   );
+
+	 volScalarField f_ini
+	 (
+	     IOobject
+	     (
+           "f_ini",
+				runTime.timeName(),
+				mesh,
+				IOobject::MUST_READ,
+				IOobject::AUTO_WRITE
+		  ),
+	     mesh
+	 );
+
+   volScalarField w_ini
+	 (
+	     IOobject
+	     (
+			   "w_ini",
+				runTime.timeName(),
+				mesh,
+				IOobject::MUST_READ,
+				IOobject::AUTO_WRITE
+		  ),
+	     mesh
+	 );
+
+	 volScalarField L_ini
+	 (
+	     IOobject
+	     (
+			   "L_ini",
+				runTime.timeName(),
+				mesh,
+				IOobject::MUST_READ,
+				IOobject::AUTO_WRITE
+		  ),
+	     mesh
+	 );
+
+
+    PtrList<volScalarField> source(3000);
+    PtrList<volScalarField> f(3000);
+    PtrList<volScalarField> w(3000);
+    PtrList<volScalarField> L(3000);
+    PtrList<volScalarField> m(3000);
+
+
+
+
+    // read PBM class from 'populationModels' packages
+	 populationBalanceModel PBM
+	 (
+		  source, 					// source term
+  		  f,							// VF of each class i
+  //      m,
+		  alpha1						// total volume fraction of dispersed phase
+	 );
+
+  //       populationBalanceReturn PBM2;
+
+	 // ************************************************************************************************
+
+Info<< "Creating field dpdt\n" << endl;
+volScalarField dpdt
+(
+    IOobject
+    (
+        "dpdt",
+        runTime.timeName(),
+        mesh
+    ),
+    mesh,
+    dimensionedScalar("dpdt", p.dimensions()/dimTime, 0)
+);
+
+
+Info<< "Creating field kinetic energy K\n" << endl;
+volScalarField K1(IOobject::groupName("K", phase1.name()), 0.5*magSqr(U1));
+volScalarField K2(IOobject::groupName("K", phase2.name()), 0.5*magSqr(U2));
+
+#include "createMRF.H"

@@ -1,0 +1,87 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         Euler;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+    grad(U.air)		cellLimited Gauss linear 1;
+    grad(U.water)	cellLimited Gauss linear 1;
+}
+
+divSchemes
+{
+    default                         none;
+
+    div(phi,alpha.air)              Gauss vanLeer01;
+    div(phir,alpha.air)             Gauss vanLeer01;
+/*
+    "div\(alphaRhoPhi.*,U.*\)"      Gauss limitedLinearV 1;
+    "div\(phi.*,U.*\)"              Gauss limitedLinearV 1;
+*/
+    "div\((alphaPhi|alphaRhoPhi|phi).air,U.air\)"		Gauss linearUpwindV grad(U.air);
+    "div\((alphaPhi|alphaRhoPhi|phi).water,U.water\)"	Gauss linearUpwindV grad(U.water);
+
+    "div\(alphaRhoPhi.*,(h|e).*\)"  Gauss limitedLinear 1;
+    "div\(alphaRhoPhi.*,K.*\)"      Gauss limitedLinear 1;
+    "div\(alphaPhi.*,p\)"           Gauss limitedLinear 1;
+
+    "div\(\(\(\(alpha.*\*thermo:rho.*\)*nuEff.*\)\*dev2\(T\(grad\(U.*\)\)\)\)\)" Gauss linear;
+
+     "div\(alphaRhoPhi.*,(k|epsilon).*\)"  bounded Gauss limitedLinear 1;
+
+	div(phim,epsilonm) bounded Gauss limitedLinear 1;
+	div(phim,km) bounded Gauss limitedLinear 1;
+
+     div(phi,moment) Gauss upwind;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+
+    "interpolate\(moment.*\)" upwind phi;
+    reconstruct(U)          upwind;
+    reconstruct(weight)     upwind;
+    reconstruct(abscissa)   upwind;
+    reconstruct(sigma)      upwind;
+
+}
+
+snGradSchemes
+{
+    default         corrected;
+}
+
+fluxRequired
+{
+    default         no;
+    p_rgh               ;
+    alpha1;
+}
+
+
+// ************************************************************************* //

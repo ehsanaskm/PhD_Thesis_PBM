@@ -1,0 +1,169 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | foam-extend: Open Source CFD
+   \\    /   O peration     |
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of foam-extend.
+
+    foam-extend is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    foam-extend is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+\*---------------------------------------------------------------------------*/
+
+#include "Constant.H"
+#include "addToRunTimeSelectionTable.H"
+#include "zeroGradientFvPatchFields.H"
+#include "incompleteGammaFunction.H"
+
+
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+namespace Foam
+{
+    defineTypeNameAndDebug(Constant, 0);
+    addToRunTimeSelectionTable(breakupLaw, Constant, dictionary);
+}
+
+// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// Construct from dictionary
+Foam::Constant::Constant
+(
+    const word& name,
+    const volScalarField& alpha,
+    const dictionary& dict
+)
+:
+    breakupLaw(name, alpha, dict),
+    dictConstantup_
+    (
+        dict.subDict("LuoAndSvendsenCoeffs")
+    ),
+
+    // Luo and Svendsen model parameters
+    rhoa_(dictConstant_.lookup("rhoa")),
+    rhob_(dictConstant_.lookup("rhob")),
+    sigma_(dictConstant_.lookup("sigma")),
+    beta_(readScalar(dictConstant_.lookup("beta"))),
+    k_(dictConstant_.lookup("k"))
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::Constant::~Constant()
+{}
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+Foam::dimensionedScalar Foam::Constant::rhoa() const
+{
+    return rhoa_;
+}
+
+Foam::dimensionedScalar Foam::Constant::rhob() const
+{
+    return rhob_;
+}
+
+Foam::dimensionedScalar Foam::Constant::breakupRate(volScalarField& vf, scalar& d1, scalar& d2) const
+
+
+{
+  //const volScalarField& epsilon =
+ //			mesh().objectRegistry::lookupObject<volScalarField>("epsilon");
+
+ const volScalarField& epsilon =
+			mesh().objectRegistry::lookupObject<volScalarField>("epsilon.water");
+
+  dimensionedScalar result("SMALL",dimMass/pow3(dimLength)/dimTime, SMALL); //Rate
+
+
+	  result = dimensionedScalar
+				  (
+						"value",
+						dimMass/pow3(dimLength)/dimTime,
+						0.02
+				  );
+
+  return result ;
+
+
+}
+
+
+Foam::dimensionedScalar Foam::Constant::breakupFrequency(volScalarField& vf, scalar& d, scalar& fbv) const
+{
+ // const volScalarField& epsilon =
+//			mesh().objectRegistry::lookupObject<volScalarField>("epsilon");
+
+  const volScalarField& epsilon =
+			mesh().objectRegistry::lookupObject<volScalarField>("epsilon.water");
+  dimensionedScalar result("SMALL",pow(dimTime,-1), SMALL); //Frequency
+
+  scalar Cf = pow(fbv, 2./3.) + pow((1.-fbv),2./3.) - 1.;
+
+  scalar b  =
+		 12.0*Cf*sigma_.value()/(
+			                          k_.value()*rhob_.value()
+			                         *Foam::pow(max(epsilon).value(), 2./3.)
+			                         *Foam::pow(d,5./3.)
+			                         + SMALL
+			                     );
+
+
+  scalar a =
+            k_.value()*beta_*max(vf).value()*pow(max(epsilon).value()/sqr(d), 1./3.);
+
+
+  scalar breakFrequency = a*
+			(
+			//	  (3./11.)*(1./Foam::pow(b, 8./11.))*incompleteGammaFunction().gammQ(8./11., b)
+			//	+ (6./11.)*(1./Foam::pow(b, 5./11.))*incompleteGammaFunction().gammQ(5./11., b)
+			//   + (3./11.)*(1./Foam::pow(b, 2./11.))*incompleteGammaFunction().gammQ(2./11., b)
+					- (1.0)*incompleteGammaFunction().gammQ(8./11., b)
+					- (2.0)*(Foam::pow(b, 3./11.))*incompleteGammaFunction().gammQ(5./11., b)
+					- (1.0)*(Foam::pow(b, 6./11.))*incompleteGammaFunction().gammQ(2./11., b)
+			);
+
+  if(breakFrequency < 0.0)
+  {
+	  result = dimensionedScalar
+				  (
+						"zero",
+						pow(dimTime,-1),
+						0.0
+				  );
+  }
+  else
+  {
+	  result = dimensionedScalar
+				  (
+						"value",
+						pow(dimTime,-1),
+						breakFrequency
+				  );
+  }
+
+  return result ;
+
+}
+
+// ************************************************************************* //
