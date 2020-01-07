@@ -19,6 +19,6 @@ Application of Extended Quadrature Method of Moments for Simulation of Bubbly Fl
 
 ## Built With
 
-* [OpenFOAM](https://openfoam.org/) - The web framework used
-* [OpenQBMM](https://www.openqbmm.org/) - Dependency Management
+* [OpenFOAM](https://openfoam.org/) 
+* [OpenQBMM](https://www.openqbmm.org/) 
 
