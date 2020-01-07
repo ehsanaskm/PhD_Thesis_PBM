@@ -1,14 +1,26 @@
-# These are the solvers and cases which I worked on during my PhD study. To understand better the modifications and examples, I would like to recommend you to read the thesis, the papers and a short guide which I prepared for you here.
+# Development, Validation and Application of Population Balance Models in Eulerian Approach for Bubbly Flow Reactors
 
-Thesis:
+
+In the present project, the Method of Classes (CM) and Quadrature-based Moments Method (QBMM) are described, implemented and compared
+using the developed CFD-PBM solver.
+
+## OpenFOAM
+
+OpenFOAM Version 4.0
+OpenFOAM Version 4.1
+OpenFOAM Version 4x
+
+The corresponding documents to understand the solver and algorithm:
+
+# Thesis
 
 Modelling of Bubbly Flow Using CFD-PBM Solver in OpenFOAM: Study of Local Population Balance Models and Extended Quadrature Method of Moments Applications
 
-Paper 1:
+# Paper 1
 
 Modelling of Bubbly Flow Using CFD-PBM Solver in OpenFOAM: Study of Local Population Balance Models and Extended Quadrature Method of Moments Applications
 
-Paper 2:
+# Paper 2
 
 Application of Extended Quadrature Method of Moments for Simulation of Bubbly Flow and Mass Transfer in Gas‐Liquid Stirred Tanks
 
