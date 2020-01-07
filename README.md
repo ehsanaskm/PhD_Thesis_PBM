@@ -17,4 +17,8 @@ Modelling of Bubbly Flow Using CFD-PBM Solver in OpenFOAM: Study of Local Popula
 Application of Extended Quadrature Method of Moments for Simulation of Bubbly Flow and Mass Transfer in Gas‐Liquid Stirred Tanks
 
 
-Enjoy!
+## Built With
+
+* [OpenFOAM](https://openfoam.org/) - The web framework used
+* [OpenQBMM](https://www.openqbmm.org/) - Dependency Management
+
