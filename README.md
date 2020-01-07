@@ -4,17 +4,9 @@
 In the present project, the Method of Classes (CM) and Quadrature-based Moments Method (QBMM) are described, implemented and compared
 using the developed CFD-PBM solver.
 
-# Thesis
-
-Modelling of Bubbly Flow Using CFD-PBM Solver in OpenFOAM: Study of Local Population Balance Models and Extended Quadrature Method of Moments Applications
-
-# Paper 1
-
-Modelling of Bubbly Flow Using CFD-PBM Solver in OpenFOAM: Study of Local Population Balance Models and Extended Quadrature Method of Moments Applications
-
-# Paper 2
-
-Application of Extended Quadrature Method of Moments for Simulation of Bubbly Flow and Mass Transfer in Gas‐Liquid Stirred Tanks
+* [Ph.D. thesis](https://savoirs.usherbrooke.ca/handle/11143/14455)  
+* [Paper 1](https://www.mdpi.com/2305-7084/2/1/8) 
+* [Paper 2](https://onlinelibrary.wiley.com/doi/abs/10.1002/cjce.23470) 
 
 
 ## Built With
